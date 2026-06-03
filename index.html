@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bio Link - @TUONGVY8386</title>
+    <style>
+        /* 1. CẤU HÌNH CƠ BẢN & FONT CHỮ */
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=Source+Code+Pro:wght@400&display=swap');
+
+        :root {
+            --primary-color: #ff6b00; /* Màu cam chủ đạo */
+            --bg-dark: #0f0f13;
+            /* Tăng độ tối của kính để nổi trên nền matrix */
+            --glass-bg: rgba(15, 15, 19, 0.7); 
+            --glass-border: rgba(255, 107, 0, 0.3);
+            --neon-glow: 0 0 15px rgba(255, 107, 0, 0.6);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            /* Nền đen tuyền để làm nổi bật matrix */
+            background-color: #000; 
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- CANVAS NỀN HACKER MATRIX --- */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Nằm sau cùng */
+        }
+
+        /* 2. KHUNG CHÍNH (CONTAINER) */
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 2; /* Nổi lên trên nền canvas */
+            animation: fadeInPage 1s ease-out;
+        }
+
+        /* 3. PHẦN AVATAR */
+        .profile-section {
+            position: relative;
+            margin-bottom: 40px;
+            display: inline-block;
+        }
+
+        .avatar-frame {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            /* Viền neon sáng hơn */
+            border: 3px solid var(--primary-color);
+            padding: 5px;
+            box-shadow: var(--neon-glow), inset 0 0 10px var(--primary-color);
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        /* --- HIỆU ỨNG MŨ RƠI --- */
+        .falling-hat {
+            position: absolute;
+            top: -45px;
+            right: -20px;
+            width: 80px;
+            z-index: 20;
+            filter: drop-shadow(0 8px 8px rgba(0,0,0,0.8));
+            animation: hat-drop-bounce 1.2s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+            transform: translateY(-500px) rotate(45deg);
+            opacity: 0;
+        }
+
+        .username {
+            margin-top: 15px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            /* Hiệu ứng chữ glitch nhẹ */
+            text-shadow: 2px 0 var(--primary-color), -2px 0 red;
+            font-family: 'Source Code Pro', monospace; /* Font kiểu code */
+        }
+
+        .bio-text {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            font-family: 'Source Code Pro', monospace;
+        }
+
+        /* 4. CÁC NÚT LIÊN KẾT */
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .link-btn {
+            position: relative;
+            background: var(--glass-bg);
+            /* Tăng độ mờ background để dễ đọc trên nền matrix */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 15px 20px;
+            border-radius: 16px;
+            color: var(--primary-color); /* Chữ màu cam */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            height: 70px;
+            opacity: 0;
+            animation: slideUp 0.6s ease-out forwards;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .link-btn:nth-child(1) { animation-delay: 1.0s; }
+        .link-btn:nth-child(2) { animation-delay: 1.2s; }
+        .link-btn:nth-child(3) { animation-delay: 1.4s; }
+        .link-btn:nth-child(4) { animation-delay: 1.6s; }
+
+        .link-btn:hover {
+            transform: translateY(-3px);
+            /* Hover sáng rực */
+            background: rgba(255, 107, 0, 0.15);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.8);
+            color: white;
+        }
+
+        .link-btn:active { transform: scale(0.98); }
+
+        .btn-logo {
+            height: 45px;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.3s;
+            /* Lọc màu logo cho hợp nền tối (tùy chọn) */
+            filter: brightness(1.2);
+        }
+
+        .link-btn:hover .btn-logo { transform: scale(1.1); }
+
+        .link-btn.text-btn {
+            height: 55px;
+            justify-content: center;
+            font-weight: 700;
+            font-family: 'Source Code Pro', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* 5. FOOTER & ANIMATION KEYFRAMES */
+        footer {
+            margin-top: 40px;
+            font-size: 0.8rem;
+            opacity: 0;
+            animation: fadeInPage 1s ease-out 1.8s forwards;
+            font-family: 'Source Code Pro', monospace;
+            color: var(--primary-color);
+        }
+
+        @keyframes hat-drop-bounce {
+            0% { transform: translateY(-500px) rotate(45deg); opacity: 0; }
+            60% { transform: translateY(10px) rotate(-5deg); opacity: 1; }
+            80% { transform: translateY(-10px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(15deg); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix-bg"></canvas>
+
+    <div class="container">
+        <div class="profile-section">
+            <img src="images-removebg-preview.png" alt="Hat" class="falling-hat">
+            
+            <div class="avatar-frame">
+                <img src="image_d9a57e.png" alt="Avatar" class="avatar-img">
+            </div>
+            
+            <h1 class="username">@TUONGVY8386</h1>
+            <p class="bio-text">Marketing • Developer • Content Creator</p>
+        </div>
+
+        <div class="links">
+            <a href="https://sc887.vip/?id=700596240" class="link-btn" target="_blank">
+                <img src="sc88-logo.png" alt="SC88" class="btn-logo">
+            </a>
+
+            <a href="https://sc887.vip/?id=700596240" class="link-btn" target="_blank">
+                <img src="images-removebg-preview (1).png" alt="OKVIP" class="btn-logo">
+            </a>
+
+            <a href="https://t.me/TUONGVY8386" class="link-btn text-btn">
+                >_ Liên hệ Telegram
+            </a>
+            
+            <a href="https://t.me/TUONGVY8386" class="link-btn text-btn">
+                >_ Nhóm Telegram Kín
+            </a>
+        </div>
+
+        <footer>
+            <p>[TOOL VIP 2026] © 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        // Thiết lập kích thước canvas full màn hình
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Các ký tự để rơi (Katakana + Số + Chữ cái)
+        const chars = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレゲゼデベペオォコソトノホモヨョロゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const charArray = chars.split('');
+        
+        const fontSize = 14;
+        let columns = canvas.width / fontSize; // Số cột
+        let drops = []; // Mảng lưu vị trí Y của các giọt mưa
+
+        // Khởi tạo vị trí ban đầu cho các giọt
+        function initDrops() {
+            columns = canvas.width / fontSize;
+            drops = [];
+            for(let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * canvas.height / fontSize; // Vị trí ngẫu nhiên để trông tự nhiên hơn
+            }
+        }
+        initDrops();
+        window.addEventListener('resize', initDrops);
+
+        // Hàm vẽ
+        function draw() {
+            // Tạo hiệu ứng vệt mờ (trail effect) bằng cách phủ một lớp đen bán trong suốt
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Màu chữ và font
+            ctx.fillStyle = '#ff6b00'; // Màu cam chủ đạo
+            ctx.font = fontSize + 'px monospace';
+
+            // Vẽ từng giọt
+            for(let i = 0; i < drops.length; i++) {
+                // Chọn ký tự ngẫu nhiên
+                const text = charArray[Math.floor(Math.random() * charArray.length)];
+                
+                // Vẽ ký tự tại vị trí cột i, hàng drops[i]
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                // Đưa giọt mưa trở lại đầu màn hình một cách ngẫu nhiên sau khi nó rơi khỏi đáy
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+                    drops[i] = 0;
+                
+                // Tăng vị trí Y
+                drops[i]++;
+            }
+        }
+
+        // Chạy animation (khoảng 33fps)
+        setInterval(draw, 33);
+    </script>
+
+</body>
+</html>
